@@ -8,15 +8,13 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { Select } from "@radix-ui/react-select";
 import { DialogClose } from "@radix-ui/react-dialog";
-import { Plus } from "lucide-react";
+import { ImageUpload } from "@/components/ui/image-upload";
 
 type TopicFormProps = {
   isOpen: boolean;
@@ -27,6 +25,7 @@ type TopicFormProps = {
     description: string;
     difficulty: string;
     estimated_time: number;
+    thumbnail_url?: string;
   };
 };
 
@@ -38,23 +37,28 @@ export const TopicFormDialog = ({ isOpen, onOpenChange, initialData }: TopicForm
   const [description, setDescription] = useState(initialData?.description || "");
   const [difficulty, setDifficulty] = useState(initialData?.difficulty || "beginner");
   const [estimatedTime, setEstimatedTime] = useState(initialData?.estimated_time || 30);
+  const [thumbnailUrl, setThumbnailUrl] = useState(initialData?.thumbnail_url || "");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    const topicData = {
+      title,
+      description,
+      difficulty,
+      estimated_time: estimatedTime,
+      thumbnail_url: thumbnailUrl
+    };
+    
     if (isEditing && initialData) {
-      await updateTopic(initialData.id, {
-        title,
-        description,
-        difficulty,
-        estimated_time: estimatedTime
-      });
+      await updateTopic(initialData.id, topicData);
     } else {
       await createTopic(
         title,
         description,
         difficulty,
-        estimatedTime
+        estimatedTime,
+        thumbnailUrl
       );
     }
     
@@ -74,6 +78,14 @@ export const TopicFormDialog = ({ isOpen, onOpenChange, initialData }: TopicForm
         </DialogHeader>
         
         <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="cover">Cover Image</Label>
+            <ImageUpload
+              value={thumbnailUrl}
+              onChange={setThumbnailUrl}
+            />
+          </div>
+          
           <div className="space-y-2">
             <Label htmlFor="title">Title</Label>
             <Input

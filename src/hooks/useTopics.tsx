@@ -28,12 +28,24 @@ export const useTopics = () => {
     },
   });
 
-  const createTopic = async (title: string, description: string, difficulty: string, estimatedTime: number) => {
+  const createTopic = async (
+    title: string, 
+    description: string, 
+    difficulty: string, 
+    estimatedTime: number,
+    thumbnailUrl?: string
+  ) => {
     setIsLoading(true);
     try {
       const { error } = await supabase
         .from('topics')
-        .insert([{ title, description, difficulty, estimated_time: estimatedTime }]);
+        .insert([{ 
+          title, 
+          description, 
+          difficulty, 
+          estimated_time: estimatedTime,
+          thumbnail_url: thumbnailUrl 
+        }]);
 
       if (error) throw error;
 
@@ -53,12 +65,13 @@ export const useTopics = () => {
     }
   };
 
-  const updateTopic = async (id: string, data: Partial<{
+  const updateTopic = async (id: string, data: {
     title: string;
     description: string;
     difficulty: string;
     estimated_time: number;
-  }>) => {
+    thumbnail_url?: string;
+  }) => {
     setIsLoading(true);
     try {
       const { error } = await supabase
