@@ -46,19 +46,20 @@ const Auth = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background">
-      <Card className="w-[400px] bg-card/50 backdrop-blur border-border/50">
-        <CardHeader className="space-y-1">
-          <CardTitle className="text-2xl font-bold text-center">Admin Login</CardTitle>
+    <div className="min-h-screen flex items-center justify-center bg-[#1A1F2C]">
+      <div className="absolute inset-0 bg-gradient-to-br from-[#1A1F2C] to-[#403E43] opacity-80" />
+      <Card className="w-[400px] relative z-10 bg-[#221F26]/60 backdrop-blur-lg border border-white/10 shadow-2xl">
+        <CardHeader className="space-y-1 pb-2">
+          <CardTitle className="text-2xl font-bold text-center text-white">Admin Login</CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="pt-4">
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
               <Input
                 id="email"
                 type="email"
                 placeholder="Email address"
-                className="bg-background/50"
+                className="bg-[#333]/70 border-white/10 text-white placeholder:text-gray-400 focus-visible:ring-white/20"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
@@ -69,7 +70,7 @@ const Auth = () => {
                 id="password"
                 type="password"
                 placeholder="Password"
-                className="bg-background/50"
+                className="bg-[#333]/70 border-white/10 text-white placeholder:text-gray-400 focus-visible:ring-white/20"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
@@ -77,7 +78,7 @@ const Auth = () => {
             </div>
             <Button
               type="submit"
-              className="w-full bg-primary hover:bg-primary/90"
+              className="w-full bg-[#6366f1] text-white hover:bg-[#4f46e5] transition-colors"
               disabled={isLoading}
             >
               {isLoading ? "Authenticating..." : "Login"}
