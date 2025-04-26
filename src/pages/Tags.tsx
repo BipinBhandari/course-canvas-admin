@@ -2,9 +2,20 @@
 import { AppLayout } from "@/components/layout/AppLayout";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Plus } from "lucide-react";
+import { Plus, Pencil, Trash2 } from "lucide-react";
+import { useTags } from "@/hooks/useTags";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 
 const Tags = () => {
+  const { tags, deleteTag } = useTags();
+
   return (
     <AppLayout>
       <div className="space-y-4">
@@ -20,8 +31,41 @@ const Tags = () => {
             <CardTitle className="text-xl font-bold text-white">All Tags</CardTitle>
           </CardHeader>
           <CardContent>
-            {/* We'll implement the tags list in the next step */}
-            <p className="text-gray-400">No tags found. Create your first tag to get started.</p>
+            {tags && tags.length > 0 ? (
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Name</TableHead>
+                    <TableHead>Category</TableHead>
+                    <TableHead>Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {tags.map((tag) => (
+                    <TableRow key={tag.id}>
+                      <TableCell>{tag.name}</TableCell>
+                      <TableCell>{tag.category}</TableCell>
+                      <TableCell>
+                        <div className="flex space-x-2">
+                          <Button variant="ghost" size="icon">
+                            <Pencil className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => deleteTag(tag.id)}
+                          >
+                            <Trash2 className="h-4 w-4 text-red-500" />
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            ) : (
+              <p className="text-gray-400">No tags found. Create your first tag to get started.</p>
+            )}
           </CardContent>
         </Card>
       </div>
