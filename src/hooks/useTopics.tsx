@@ -12,7 +12,17 @@ export const useTopics = () => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('topics')
-        .select('*')
+        .select(`
+          *,
+          topic_tags(
+            tag_id,
+            tags(
+              id,
+              name,
+              category
+            )
+          )
+        `)
         .order('created_at', { ascending: false });
 
       if (error) {
@@ -33,11 +43,13 @@ export const useTopics = () => {
     description: string, 
     difficulty: string, 
     estimatedTime: number,
-    thumbnailUrl?: string
+    thumbnailUrl?: string,
+    tagId?: string
   ) => {
     setIsLoading(true);
     try {
-      const { error } = await supabase
+      // First create the topic
+      const { data: topicData, error: topicError } = await supabase
         .from('topics')
         .insert([{ 
           title, 
@@ -45,9 +57,23 @@ export const useTopics = () => {
           difficulty, 
           estimated_time: estimatedTime,
           thumbnail_url: thumbnailUrl 
-        }]);
+        }])
+        .select()
+        .single();
 
-      if (error) throw error;
+      if (topicError) throw topicError;
+
+      // If a tag was selected, create the topic-tag relationship
+      if (tagId && topicData) {
+        const { error: tagError } = await supabase
+          .from('topic_tags')
+          .insert([{
+            topic_id: topicData.id,
+            tag_id: tagId
+          }]);
+
+        if (tagError) throw tagError;
+      }
 
       await refetch();
       toast({
@@ -71,15 +97,42 @@ export const useTopics = () => {
     difficulty: string;
     estimated_time: number;
     thumbnail_url?: string;
+    tag_id?: string;
   }) => {
     setIsLoading(true);
     try {
-      const { error } = await supabase
+      // Update the topic
+      const { error: topicError } = await supabase
         .from('topics')
-        .update(data)
+        .update({
+          title: data.title,
+          description: data.description,
+          difficulty: data.difficulty,
+          estimated_time: data.estimated_time,
+          thumbnail_url: data.thumbnail_url
+        })
         .eq('id', id);
 
-      if (error) throw error;
+      if (topicError) throw topicError;
+
+      // Update the tag relationship if a tag is specified
+      if (data.tag_id) {
+        // First remove any existing tags
+        await supabase
+          .from('topic_tags')
+          .delete()
+          .eq('topic_id', id);
+
+        // Then add the new tag
+        const { error: tagError } = await supabase
+          .from('topic_tags')
+          .insert([{
+            topic_id: id,
+            tag_id: data.tag_id
+          }]);
+
+        if (tagError) throw tagError;
+      }
 
       await refetch();
       toast({

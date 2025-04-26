@@ -1,6 +1,7 @@
 
 import { useState } from "react";
 import { useTopics } from "@/hooks/useTopics";
+import { useTags } from "@/hooks/useTags";
 import {
   Dialog,
   DialogContent,
@@ -15,6 +16,14 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { DialogClose } from "@radix-ui/react-dialog";
 import { ImageUpload } from "@/components/ui/image-upload";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Tag } from "lucide-react";
 
 type TopicFormProps = {
   isOpen: boolean;
@@ -32,12 +41,14 @@ type TopicFormProps = {
 export const TopicFormDialog = ({ isOpen, onOpenChange, initialData }: TopicFormProps) => {
   const isEditing = !!initialData;
   const { createTopic, updateTopic, isLoading } = useTopics();
+  const { tags } = useTags();
   
   const [title, setTitle] = useState(initialData?.title || "");
   const [description, setDescription] = useState(initialData?.description || "");
   const [difficulty, setDifficulty] = useState(initialData?.difficulty || "beginner");
   const [estimatedTime, setEstimatedTime] = useState(initialData?.estimated_time || 30);
   const [thumbnailUrl, setThumbnailUrl] = useState(initialData?.thumbnail_url || "");
+  const [selectedTag, setSelectedTag] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -47,7 +58,8 @@ export const TopicFormDialog = ({ isOpen, onOpenChange, initialData }: TopicForm
       description,
       difficulty,
       estimated_time: estimatedTime,
-      thumbnail_url: thumbnailUrl
+      thumbnail_url: thumbnailUrl,
+      tag_id: selectedTag || undefined
     };
     
     if (isEditing && initialData) {
@@ -58,7 +70,8 @@ export const TopicFormDialog = ({ isOpen, onOpenChange, initialData }: TopicForm
         description,
         difficulty,
         estimatedTime,
-        thumbnailUrl
+        thumbnailUrl,
+        selectedTag
       );
     }
     
@@ -108,6 +121,41 @@ export const TopicFormDialog = ({ isOpen, onOpenChange, initialData }: TopicForm
               className="bg-black/20 border-white/10 text-white"
               required
             />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="tag">Tag</Label>
+            <Select value={selectedTag} onValueChange={setSelectedTag}>
+              <SelectTrigger className="bg-black/20 border-white/10 text-white">
+                <SelectValue placeholder="Select a tag">
+                  {selectedTag ? (
+                    <div className="flex items-center">
+                      <Tag className="w-4 h-4 mr-2" />
+                      {tags?.find(t => t.id === selectedTag)?.name || "Select a tag"}
+                    </div>
+                  ) : (
+                    <div className="flex items-center">
+                      <Tag className="w-4 h-4 mr-2" />
+                      Select a tag
+                    </div>
+                  )}
+                </SelectValue>
+              </SelectTrigger>
+              <SelectContent className="bg-[#221F26] border-white/10">
+                {tags?.map((tag) => (
+                  <SelectItem 
+                    key={tag.id} 
+                    value={tag.id}
+                    className="text-white hover:bg-white/10"
+                  >
+                    <div className="flex items-center">
+                      <Tag className="w-4 h-4 mr-2" />
+                      {tag.name} ({tag.category})
+                    </div>
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
           
           <div className="grid grid-cols-2 gap-4">
