@@ -56,22 +56,28 @@ export const ImageUpload = ({ value, onChange, className }: ImageUploadProps) =>
         )}
       </div>
       <div className="space-y-2">
-        <Button
-          type="button"
-          variant="outline"
-          className="border-white/10"
-          disabled={isUploading}
-        >
-          <Upload className="h-4 w-4 mr-2" />
-          {isUploading ? "Uploading..." : "Upload Image"}
-          <input
-            type="file"
-            accept="image/*"
-            className="absolute inset-0 opacity-0 cursor-pointer"
-            onChange={handleImageUpload}
+        <div className="relative">
+          <Button
+            type="button"
+            variant="outline"
+            className="border-white/10"
             disabled={isUploading}
-          />
-        </Button>
+            onClick={(e) => {
+              e.preventDefault(); // Prevent any form submission
+            }}
+          >
+            <Upload className="h-4 w-4 mr-2" />
+            {isUploading ? "Uploading..." : "Upload Image"}
+            <input
+              type="file"
+              accept="image/*"
+              className="absolute inset-0 opacity-0 cursor-pointer"
+              onChange={handleImageUpload}
+              disabled={isUploading}
+              onClick={(e) => e.stopPropagation()} // Stop event from propagating up
+            />
+          </Button>
+        </div>
       </div>
     </div>
   );
