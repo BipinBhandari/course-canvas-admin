@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -9,6 +8,7 @@ import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
 import Topics from "./pages/Topics";
+import TopicDetails from "./pages/TopicDetails";
 import Tags from "./pages/Tags";
 
 const queryClient = new QueryClient();
@@ -34,6 +34,14 @@ const App = () => (
             element={
               <AuthGuard>
                 <Topics />
+              </AuthGuard>
+            }
+          />
+          <Route
+            path="/topics/:id"
+            element={
+              <AuthGuard>
+                <TopicDetails />
               </AuthGuard>
             }
           />
