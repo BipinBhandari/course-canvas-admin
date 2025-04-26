@@ -1,13 +1,21 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+
+import { AppLayout } from "@/components/layout/AppLayout";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 const Index = () => {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold mb-4">Welcome to Your Blank App</h1>
-        <p className="text-xl text-gray-600">Start building your amazing project here!</p>
-      </div>
-    </div>
+    <AppLayout>
+      <Card className="bg-[#221F26]/60 backdrop-blur-lg border-white/10">
+        <CardHeader>
+          <CardTitle className="text-2xl font-bold text-white">Welcome to Admin Dashboard</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="text-gray-400">
+            Use the sidebar to navigate between topics and tags management.
+          </p>
+        </CardContent>
+      </Card>
+    </AppLayout>
   );
 };
 
