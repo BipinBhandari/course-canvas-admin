@@ -38,39 +38,41 @@ export const useTopics = () => {
     },
   });
 
-  const createTopic = async (
-    title: string, 
-    description: string, 
-    difficulty: string, 
-    estimatedTime: number,
-    thumbnailUrl?: string,
-    tagId?: string
-  ) => {
+  const createTopic = async (topicData: {
+    title: string;
+    description: string;
+    difficulty: string;
+    estimated_time: number;
+    thumbnail_url?: string;
+    tag_ids?: string[];
+  }) => {
     setIsLoading(true);
     try {
       // First create the topic
-      const { data: topicData, error: topicError } = await supabase
+      const { data: createdTopic, error: topicError } = await supabase
         .from('topics')
         .insert([{ 
-          title, 
-          description, 
-          difficulty, 
-          estimated_time: estimatedTime,
-          thumbnail_url: thumbnailUrl 
+          title: topicData.title, 
+          description: topicData.description, 
+          difficulty: topicData.difficulty, 
+          estimated_time: topicData.estimated_time,
+          thumbnail_url: topicData.thumbnail_url 
         }])
         .select()
         .single();
 
       if (topicError) throw topicError;
 
-      // If a tag was selected, create the topic-tag relationship
-      if (tagId && topicData) {
+      // Create topic-tag relationships if tags are selected
+      if (topicData.tag_ids && topicData.tag_ids.length > 0 && createdTopic) {
+        const tagRelationships = topicData.tag_ids.map(tagId => ({
+          topic_id: createdTopic.id,
+          tag_id: tagId
+        }));
+
         const { error: tagError } = await supabase
           .from('topic_tags')
-          .insert([{
-            topic_id: topicData.id,
-            tag_id: tagId
-          }]);
+          .insert(tagRelationships);
 
         if (tagError) throw tagError;
       }
@@ -91,47 +93,51 @@ export const useTopics = () => {
     }
   };
 
-  const updateTopic = async (id: string, data: {
+  const updateTopic = async (id: string, topicData: {
     title: string;
     description: string;
     difficulty: string;
     estimated_time: number;
     thumbnail_url?: string;
-    tag_id?: string;
+    tag_ids?: string[];
   }) => {
     setIsLoading(true);
     try {
-      // Update the topic
+      // Update the topic details
       const { error: topicError } = await supabase
         .from('topics')
         .update({
-          title: data.title,
-          description: data.description,
-          difficulty: data.difficulty,
-          estimated_time: data.estimated_time,
-          thumbnail_url: data.thumbnail_url
+          title: topicData.title,
+          description: topicData.description,
+          difficulty: topicData.difficulty,
+          estimated_time: topicData.estimated_time,
+          thumbnail_url: topicData.thumbnail_url
         })
         .eq('id', id);
 
       if (topicError) throw topicError;
 
-      // Update the tag relationship if a tag is specified
-      if (data.tag_id) {
-        // First remove any existing tags
+      // Update topic-tag relationships
+      if (topicData.tag_ids) {
+        // First remove existing tag relationships
         await supabase
           .from('topic_tags')
           .delete()
           .eq('topic_id', id);
 
-        // Then add the new tag
-        const { error: tagError } = await supabase
-          .from('topic_tags')
-          .insert([{
+        // Then add new tag relationships if tags are selected
+        if (topicData.tag_ids.length > 0) {
+          const tagRelationships = topicData.tag_ids.map(tagId => ({
             topic_id: id,
-            tag_id: data.tag_id
-          }]);
+            tag_id: tagId
+          }));
 
-        if (tagError) throw tagError;
+          const { error: tagError } = await supabase
+            .from('topic_tags')
+            .insert(tagRelationships);
+
+          if (tagError) throw tagError;
+        }
       }
 
       await refetch();

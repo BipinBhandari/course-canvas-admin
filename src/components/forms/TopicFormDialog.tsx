@@ -1,7 +1,11 @@
-
 import { useState } from "react";
 import { useTopics } from "@/hooks/useTopics";
 import { useTags } from "@/hooks/useTags";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import { ImageUpload } from "@/components/ui/image-upload";
 import {
   Dialog,
   DialogContent,
@@ -9,13 +13,8 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
+  DialogClose,
 } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
-import { DialogClose } from "@radix-ui/react-dialog";
-import { ImageUpload } from "@/components/ui/image-upload";
 import {
   Select,
   SelectContent,
@@ -23,7 +22,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Tag } from "lucide-react";
+import { Tags } from "lucide-react";
 
 type TopicFormProps = {
   isOpen: boolean;
@@ -35,10 +34,15 @@ type TopicFormProps = {
     difficulty: string;
     estimated_time: number;
     thumbnail_url?: string;
+    topic_tags?: { tag_id: string; tags: { name: string; category: string } }[];
   };
 };
 
-export const TopicFormDialog = ({ isOpen, onOpenChange, initialData }: TopicFormProps) => {
+export const TopicFormDialog = ({ 
+  isOpen, 
+  onOpenChange, 
+  initialData 
+}: TopicFormProps) => {
   const isEditing = !!initialData;
   const { createTopic, updateTopic, isLoading } = useTopics();
   const { tags } = useTags();
@@ -48,7 +52,18 @@ export const TopicFormDialog = ({ isOpen, onOpenChange, initialData }: TopicForm
   const [difficulty, setDifficulty] = useState(initialData?.difficulty || "beginner");
   const [estimatedTime, setEstimatedTime] = useState(initialData?.estimated_time || 30);
   const [thumbnailUrl, setThumbnailUrl] = useState(initialData?.thumbnail_url || "");
-  const [selectedTag, setSelectedTag] = useState("");
+  
+  const [selectedTags, setSelectedTags] = useState<string[]>(
+    initialData?.topic_tags?.map(tt => tt.tag_id) || []
+  );
+
+  const handleTagToggle = (tagId: string) => {
+    setSelectedTags(prevTags => 
+      prevTags.includes(tagId)
+        ? prevTags.filter(id => id !== tagId)
+        : [...prevTags, tagId]
+    );
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -59,20 +74,13 @@ export const TopicFormDialog = ({ isOpen, onOpenChange, initialData }: TopicForm
       difficulty,
       estimated_time: estimatedTime,
       thumbnail_url: thumbnailUrl,
-      tag_id: selectedTag || undefined
+      tag_ids: selectedTags
     };
     
     if (isEditing && initialData) {
       await updateTopic(initialData.id, topicData);
     } else {
-      await createTopic(
-        title,
-        description,
-        difficulty,
-        estimatedTime,
-        thumbnailUrl,
-        selectedTag
-      );
+      await createTopic(topicData);
     }
     
     onOpenChange(false);
@@ -124,38 +132,26 @@ export const TopicFormDialog = ({ isOpen, onOpenChange, initialData }: TopicForm
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="tag">Tag</Label>
-            <Select value={selectedTag} onValueChange={setSelectedTag}>
-              <SelectTrigger className="bg-black/20 border-white/10 text-white">
-                <SelectValue placeholder="Select a tag">
-                  {selectedTag ? (
-                    <div className="flex items-center">
-                      <Tag className="w-4 h-4 mr-2" />
-                      {tags?.find(t => t.id === selectedTag)?.name || "Select a tag"}
-                    </div>
-                  ) : (
-                    <div className="flex items-center">
-                      <Tag className="w-4 h-4 mr-2" />
-                      Select a tag
-                    </div>
-                  )}
-                </SelectValue>
-              </SelectTrigger>
-              <SelectContent className="bg-[#221F26] border-white/10">
-                {tags?.map((tag) => (
-                  <SelectItem 
-                    key={tag.id} 
-                    value={tag.id}
-                    className="text-white hover:bg-white/10"
-                  >
-                    <div className="flex items-center">
-                      <Tag className="w-4 h-4 mr-2" />
-                      {tag.name} ({tag.category})
-                    </div>
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <Label>Tags</Label>
+            <div className="flex flex-wrap gap-2">
+              {tags?.map((tag) => (
+                <Button
+                  key={tag.id}
+                  type="button"
+                  variant={selectedTags.includes(tag.id) ? "default" : "outline"}
+                  size="sm"
+                  className={`flex items-center gap-2 ${
+                    selectedTags.includes(tag.id)
+                      ? "bg-[#6366f1] hover:bg-[#4f46e5]"
+                      : "border-white/10 text-white hover:bg-white/10"
+                  }`}
+                  onClick={() => handleTagToggle(tag.id)}
+                >
+                  <Tags className="h-4 w-4" />
+                  {tag.name} ({tag.category})
+                </Button>
+              ))}
+            </div>
           </div>
           
           <div className="grid grid-cols-2 gap-4">
