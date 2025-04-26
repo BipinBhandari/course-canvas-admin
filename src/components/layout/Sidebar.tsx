@@ -44,7 +44,7 @@ export const Sidebar = () => {
             <SidebarMenu>
               <SidebarMenuItem>
                 <SidebarMenuButton asChild>
-                  <a href="/topics" className="flex items-center">
+                  <a href="/topics" className="flex items-center text-white/90 hover:text-white">
                     <BookText className="mr-2" />
                     <span>Topics</span>
                   </a>
@@ -52,7 +52,7 @@ export const Sidebar = () => {
               </SidebarMenuItem>
               <SidebarMenuItem>
                 <SidebarMenuButton asChild>
-                  <a href="/tags" className="flex items-center">
+                  <a href="/tags" className="flex items-center text-white/90 hover:text-white">
                     <Tag className="mr-2" />
                     <span>Tags</span>
                   </a>
@@ -65,7 +65,10 @@ export const Sidebar = () => {
           <SidebarGroupContent>
             <SidebarMenu>
               <SidebarMenuItem>
-                <SidebarMenuButton onClick={handleLogout} className="flex items-center text-red-500 hover:text-red-400">
+                <SidebarMenuButton 
+                  onClick={handleLogout} 
+                  className="flex items-center text-red-400 hover:text-red-300"
+                >
                   <LogOut className="mr-2" />
                   <span>Logout</span>
                 </SidebarMenuButton>
