@@ -1,4 +1,3 @@
-
 import {
   Sidebar as ShadcnSidebar,
   SidebarContent,
@@ -11,13 +10,14 @@ import {
   SidebarHeader,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
-import { LogOut, BookText, Tag } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { LogOut, BookText, Tag, LayoutDashboard } from "lucide-react";
+import { useNavigate, useLocation } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 
 export const Sidebar = () => {
   const navigate = useNavigate();
+  const location = useLocation();
 
   const handleLogout = async () => {
     try {
@@ -39,11 +39,25 @@ export const Sidebar = () => {
       </SidebarHeader>
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel>Content Management</SidebarGroupLabel>
+          <SidebarGroupLabel>Navigation</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               <SidebarMenuItem>
-                <SidebarMenuButton asChild>
+                <SidebarMenuButton 
+                  asChild
+                  isActive={location.pathname === '/'}
+                >
+                  <a href="/" className="flex items-center text-white/90 hover:text-white">
+                    <LayoutDashboard className="mr-2" />
+                    <span>Dashboard</span>
+                  </a>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                <SidebarMenuButton 
+                  asChild
+                  isActive={location.pathname === '/topics'}
+                >
                   <a href="/topics" className="flex items-center text-white/90 hover:text-white">
                     <BookText className="mr-2" />
                     <span>Topics</span>
@@ -51,7 +65,10 @@ export const Sidebar = () => {
                 </SidebarMenuButton>
               </SidebarMenuItem>
               <SidebarMenuItem>
-                <SidebarMenuButton asChild>
+                <SidebarMenuButton 
+                  asChild
+                  isActive={location.pathname === '/tags'}
+                >
                   <a href="/tags" className="flex items-center text-white/90 hover:text-white">
                     <Tag className="mr-2" />
                     <span>Tags</span>
