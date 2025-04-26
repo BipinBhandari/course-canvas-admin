@@ -47,33 +47,29 @@ const Auth = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background">
-      <Card className="w-[400px]">
-        <CardHeader>
+      <Card className="w-[400px] bg-card/50 backdrop-blur border-border/50">
+        <CardHeader className="space-y-1">
           <CardTitle className="text-2xl font-bold text-center">Admin Login</CardTitle>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
-              <label htmlFor="email" className="text-sm font-medium">
-                Email
-              </label>
               <Input
                 id="email"
                 type="email"
-                placeholder="Enter your email"
+                placeholder="Email address"
+                className="bg-background/50"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
               />
             </div>
             <div className="space-y-2">
-              <label htmlFor="password" className="text-sm font-medium">
-                Password
-              </label>
               <Input
                 id="password"
                 type="password"
-                placeholder="Enter your password"
+                placeholder="Password"
+                className="bg-background/50"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
@@ -81,10 +77,10 @@ const Auth = () => {
             </div>
             <Button
               type="submit"
-              className="w-full"
+              className="w-full bg-primary hover:bg-primary/90"
               disabled={isLoading}
             >
-              {isLoading ? "Logging in..." : "Login"}
+              {isLoading ? "Authenticating..." : "Login"}
             </Button>
           </form>
         </CardContent>
